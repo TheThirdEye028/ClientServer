@@ -2,6 +2,7 @@ app.service('registerService', ['$http', function($http) {
     this.images = [];
     this.name = "";
     this.age = 0;
+    //$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
 
     this.updateImages = function(nImage) {
         this.images.push(nImage);
@@ -13,9 +14,6 @@ app.service('registerService', ['$http', function($http) {
     };
 
     this.postData = function() {
-        images.map(function(image) {
-            
-        });
-        return $http.post('/upload', {'name': this.name, 'age': this.age,'images': this.images});
+        return $http.post('/upload', { name: this.name, images: this.images });
     };
 }]);

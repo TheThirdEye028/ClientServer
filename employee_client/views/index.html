@@ -2,8 +2,9 @@
     <head>
         <link rel="stylesheet" href="/static/css/capture.css" type="text/css" media="all">
         <link rel="stylesheet" href="/static/css/form.css" type="text/css" media="all">
+        <link rel="stylesheet" href="/static/css/gallery.css" type="text/css" media="all">
     </head>
-    <body>
+    <body ng-app="RegisterApp">
         <!-- multistep form -->
         <form id="msform">
             <!-- progressbar -->
@@ -13,48 +14,60 @@
                 <li>Sigint Resources</li>
             </ul>
             <!-- fieldsets -->
-            <fieldset>
+            <fieldset ng-controller="InfoCtrl">
                 <h2 class="fs-title">Personal Details</h2>
-                <input type="text" name="fname" placeholder="First Name" />
-                <input type="text" name="lname" placeholder="Last Name" />
-                <input type="text" name="phone" placeholder="Phone" />
-                <textarea name="address" placeholder="Address"></textarea>
-                <input type="button" name="next" class="next action-button" value="Next" />
+                <input type="text" ng-model="fname" name="fname" placeholder="First Name" />
+                <input type="text" ng-model="lname" placeholder="Last Name" />
+                <input type="text" ng-model="age" name="age" placeholder="Age" />
+                <input type="button" name="next" class="next action-button" value="Next" ng-click="updateInfo()" />
             </fieldset>
-            <fieldset>
+            <fieldset ng-controller="CameraCtrl">
                 <h2 class="fs-title">Take an image</h2>
                 <h3 class="fs-subtitle">We will never sell it</h3>
                 <div class="contentarea">
-                    <div class="camera">
+                    <div class="camera" ng-show="showVideo.value">
                         <video id="video">Video stream not available.</video>
-                        <button id="startbutton">Take photo</button> 
+                        <button id="startbutton" ng-click="startbuttonclick()">Take photo</button> 
                     </div>
                     <canvas id="canvas">
                     </canvas>
-                    <div class="output">
-                        <img id="photo" alt="The screen capture will appear in this box."> 
+                    <div id="output" ng-show="!showVideo.value">
+                        <img id="photo" alt="The screen capture will appear in this box.">
+                        <button id="confirmbutton" ng-click="confirmbuttonclick()">Confirm photo</button> 
+                        <button id="retakebutton" ng-click="retakebuttonclick()">Retake photo</button>  
+                    </div>
+                    <div id="photos" class="gallery cf">
+                        <span ng-repeat="img in images">
+                            <img ng-src="{{img}}" />
+                        </span>
                     </div>
                 </div>
                 <input type="button" name="previous" class="previous action-button" value="Previous" />
                 <input type="button" name="next" class="next action-button" value="Next" />
             </fieldset>
-            <fieldset>
+            <fieldset ng-controller="RegisterCtrl">
                 <h2 class="fs-title">Sigint Resources</h2>
                 <h3 class="fs-subtitle">We will never sell it</h3>
                 <input type="text" name="twitter" placeholder="Twitter" />
                 <input type="text" name="facebook" placeholder="Facebook" />
                 <input type="text" name="gplus" placeholder="Google Plus" />
                 <input type="button" name="previous" class="previous action-button" value="Previous" />
-                
-                <input type="submit" name="submit" class="submit action-button" value="Submit" />
+                <button name="submit" ng-click="register()" class="submit action-button">Submit</button>
+                <!--<input type="submit" name="submit" class="submit action-button" value="Submit" />-->
             </fieldset>
         </form>
         
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.9/angular.min.js" type="text/javascript"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.9/angular-route.min.js" type="text/javascript"></script>
         <!-- jQuery -->
         <script src="http://thecodeplayer.com/uploads/js/jquery-1.9.1.min.js" type="text/javascript"></script>
         <!-- jQuery easing plugin -->
         <script src="http://thecodeplayer.com/uploads/js/jquery.easing.min.js" type="text/javascript"></script>
         <script src="/static/js/form.js" type="text/javascript" ></script>
+        <script src="/static/js/register.js" type="text/javascript" ></script>
+        <script src="/static/js/register.service.js" type="text/javascript" ></script>
+        <script src="/static/js/info.controller.js" type="text/javascript" ></script>
+        <script src="/static/js/camera.controller.js" type="text/javascript" ></script>
         <script src="/static/js/capture.js" type="text/javascript" ></script>
     </body>
 </html>

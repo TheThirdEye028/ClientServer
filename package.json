@@ -12,6 +12,8 @@
     "express": "~4.14.0",
     "request": "~2.74.0",
     "node-base64-image": "~1.0.1",
-    "querystring": "~0.2.0"
+    "querystring": "~0.2.0",
+    "fs": "0.0.1-security",
+    "cloudinary": "~1.4.1"
   }
 }

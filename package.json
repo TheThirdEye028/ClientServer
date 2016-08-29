@@ -16,6 +16,7 @@
     "fs": "0.0.1-security",
     "cloudinary": "~1.4.1",
     "body-parser": "~1.15.2",
-    "mongoose": "~4.5.10"
+    "mongoose": "~4.5.10",
+    "socket.io": "~1.4.8"
   }
 }

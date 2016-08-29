@@ -8,10 +8,19 @@ var mongoose = require('mongoose');
 var Worker = require('./db/workers').worker;
 var fs = require('fs');
 var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+
+io.on('connection', function(socket){
+  console.log('a user connected');
+  socket.on('photo', function(photo) {
+      console.log(photo);
+  });
+});
 
 var api_key = "7c061fd4eab8115951e52254f489df0c";
 var api_secret = "zqg-w5R8mzu7JEiTyAFmTHD2CRRnJ5xH";
-var ugliesGrpId = "a5ad4776d0c94cb9ed0e619c411c196f";
+var ugliesGrpId = "f57eb4d00d36c8d6a7846aa267c7a08c";
 
 mongoose.connect('mongodb://localhost/admin');
 var db = mongoose.connection;
@@ -37,7 +46,10 @@ cloudinary.config({
 app.post('/upload', function(req, res) {
     var name = req.body.name;
     var images = req.body.images;
-    var newbie = new Worker({ worker_name: name, images: [], worker_id: "" });
+    var posts = req.body.posts;
+    var age = req.body.age;
+    var id = req.body.id;
+    var newbie = new Worker({id: id, worker_name: name, images: [], posts: posts, worker_id: "", age: age });
     var index = 0;
     
     images.forEach(function(image) {
@@ -51,7 +63,7 @@ app.post('/upload', function(req, res) {
         });
     });
     
-    console.log(res);
+    //console.log(res);
 });
 
 function mapFacePP(worker) {
@@ -65,13 +77,13 @@ function mapFacePP(worker) {
             var renBody = JSON.parse(body);
             index++;
             if (renBody.face.length == 0) {
-                consolge.log("No faces recognized on photo no. " + index);
+                console.log("No faces recognized on photo no. " + index);
             } else if (!err) {
                 facesArr.push(renBody.face[0].face_id);
+            }
                 
-                if (index == worker.images.length) {
-                    createPerson(facesArr, worker);
-                }
+            if (index == worker.images.length) {
+                createPerson(facesArr, worker);
             }
         });
     })
@@ -96,19 +108,37 @@ function createPerson(faces, worker) {
             worker.save();
             
             // Training the group
-            var secReqStr = 'https://apius.faceplusplus.com/v2/person/create?'
+            var secReqStr = 'https://apius.faceplusplus.com/v2/train/identify?'
                 + 'api_key=' + api_key + '&'
                 + 'api_secret=' + api_secret + '&'
-                + 'group_id=' + ugliesGrpId + '&';
-                
+                + 'group_id=' + ugliesGrpId;
             request(secReqStr, function(err, res, body) {
                 console.log(body);
             });
         }
     );
     
-    console.log(faces);
+    //console.log(faces);
 }
+
+app.post('/recognize', function(req, res) {
+    var photo = req.body.photo;
+    
+    cloudinary.uploader.upload(photo, function(result) {
+        var secReqStr = 'https://apius.faceplusplus.com/v2/recognition/identify?'
+                        + 'api_key=' + api_key + '&'
+                        + 'api_secret=' + api_secret + '&'
+                        + 'group_id=' + ugliesGrpId + '&'
+                        + 'url=' + result;
+        request(secReqStr, function(err, resp, body) {
+            Worker.findOne({ worker_id: JSON.parse(body).face[0].candidate[0].person_id }, function(err, worker) {
+                if (!err) {
+                    res.send(worker);
+                }
+            });
+        });
+    });
+});
 
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!');
